@@ -52,13 +52,13 @@ static void help()
 
 class Image
 {
-
 private:
     string directory ="location=/Users/georgemanolakis/desktop/pix/";
     vector<string> file_location;
     int edgeThresh = 1;
     int edgeThreshScharr=1;
-    Mat image, gray, blurImage, edge1, edge2, cedge;
+    vector<Mat> image;
+    Mat gray, blurImage, edge1, edge2, cedge;
     const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
     const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
     
@@ -75,6 +75,28 @@ private:
     {
         return file_location[0];
     }
+    void append_images()
+    {
+        unsigned long i=1;
+        while(i<file_location.size())
+        {
+        image.push_back(imread(get_file_location(),IMREAD_COLOR));
+    
+            if(!image[i].empty())
+            {
+                pop_file_location();
+                //return; //Need to figure out how to make conditions considering that file directories for that image file to compare with
+            }
+            else
+            {
+                image.erase(image.begin());
+                i=i+1;
+            }
+            
+        }
+        
+    }
+    
     
 };
 
@@ -84,6 +106,10 @@ private:
 int main( int argc, const char** argv )
 {
     Image file;
+    file.append_file_location("1.png");
+    file.append_file_location("2.png");
+    file.append_file_location("3.png");
+    file.append_images();
     
     
     
