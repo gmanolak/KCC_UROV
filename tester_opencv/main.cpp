@@ -3,9 +3,8 @@
 //  tester_opencv
 //
 //  Created by George Manolakis on 1/29/18.
-//  Copyright © 2018 George Manolakis. All rights reserved.
 //
-
+//SAMPLE FROM OPENCV WEBSITE
 #include <iostream>
 #include "opencv2/core/utility.hpp"
 #include "opencv2/imgproc.hpp"
