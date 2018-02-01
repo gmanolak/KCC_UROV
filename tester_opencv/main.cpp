@@ -6,11 +6,13 @@
 //
 //SAMPLE FROM OPENCV WEBSITE
 #include <iostream>
+#include<vector>
 #include "opencv2/core/utility.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include <stdio.h>
+
 using namespace cv;
 using namespace std;
 int edgeThresh = 1;
@@ -18,6 +20,7 @@ int edgeThreshScharr=1;
 Mat image, gray, blurImage, edge1, edge2, cedge;
 const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
 const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
+
 // define a trackbar callback
 static void onTrackbar(int, void*)
 {
@@ -41,12 +44,51 @@ static void help()
            "Call:\n"
            "    /.edge [image_name -- Default is ../data/fruits.jpg]\n\n");
 }
-const char* keys =
+
+//const char* keys =
+//{
+ //   "{help h||}{@image |/Users/georgemanolakis/desktop/pix/3.png|input image name}"
+//};
+
+class Image
 {
-    "{help h||}{@image |/Users/georgemanolakis/desktop/pix/2.png|input image name}"
+
+private:
+    string directory ="location=/Users/georgemanolakis/desktop/pix/";
+    vector<string> file_location;
+    int edgeThresh = 1;
+    int edgeThreshScharr=1;
+    Mat image, gray, blurImage, edge1, edge2, cedge;
+    const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
+    const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
+    
+ public:
+    void append_file_location(string file)
+    {
+        file_location.push_back(directory + file);
+    }
+    void pop_file_location()
+    {
+        file_location.erase(file_location.begin());
+    }
+    string get_file_location()
+    {
+        return file_location[0];
+    }
+    
 };
+
+
+
+
 int main( int argc, const char** argv )
 {
+    Image file;
+    
+    
+    
+    
+/*
     help();
     CommandLineParser parser(argc, argv, keys);
     string filename = parser.get<string>(0);
@@ -70,4 +112,5 @@ int main( int argc, const char** argv )
     // Wait for a key stroke; the same function arranges events processing
     waitKey(0);
     return 0;
+ */
 }
