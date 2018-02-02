@@ -4,7 +4,7 @@
 //
 //  Created by George Manolakis on 1/29/18.
 //
-//SAMPLE FROM OPENCV WEBSITE
+//THANKS to openCV examples
 #include <iostream>
 
 #include<vector>
