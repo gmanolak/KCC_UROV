@@ -8,28 +8,31 @@
 #include <iostream>
 
 #include<vector>
-//#include "opencv2/core/utility.hpp"
+#include "opencv2/core/utility.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include <stdio.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/stitching.hpp>
 
 using namespace cv;
+//using namespace cv2;
 using namespace std;
 
 int edgeThresh = 1;
 int edgeThreshScharr=1;
 Mat image, gray, blurImage, edge1, edge2, cedge,edge_detect;
-const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
-const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
 
 int lowThreshold;
 int const max_lowThreshold = 100;
 int rat = 3;
 int kernel_size = 3;
 Mat files;
+Mat result;
 Mat files2;
-
+Mat dst;
+Mat diff;
 class Image
 {
 //private:
@@ -110,9 +113,9 @@ int main( int argc, const char** argv )
     unsigned long i=0;
     const char* window_name = "Edge Map";
     
-    file.append_file_location("1.png");
-    file.append_file_location("2.png");
-    file.append_file_location("3.png");
+    file.append_file_location("4.jpeg");
+    file.append_file_location("2.jpeg");
+    file.append_file_location("3.jpeg");
     file.append_file_location("4.png");
     file.append_images();
     //imshow("window", file.image[0]);
@@ -134,6 +137,56 @@ int main( int argc, const char** argv )
         i=i+1;
         waitKey(0);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //TRYING TO FIGURE OUT HOW TO COMPARE TWO IMAGES
+    // trying to get values of differences or similiarities to be able to determine facts in code.
+    
+    files=file.converted_image[1];
+    files2=file.converted_image[0];
+    //addWeighted( files, .1, files2, .9, 100, dst);
+    //imshow("fuc",dst);
+    //waitKey(0);
+    
+    //compare(files,files,result,CMP_EQ);
+    //int percentage=countNonZero(result);
+   // cout<<percentage<<endl;
+    //return 0;
+   // matchTemplate(files, files, result, CMP_EQ);
+    //cout<<endl;
+    //cout<<result<<endl;
+    absdiff(files, files2, diff);
+    int th = 10;  // 0
+    Mat mask(files.size(), CV_8UC1);
+    
+    for(int j=0; j<diff.rows; ++j) {
+        for(int i=0; i<diff.cols; ++i){
+            Vec3b pix = diff.at<cv::Vec3b>(j,i);
+            int val = (pix[0] + pix[1] + pix[2]);
+            if(val>th){
+                mask.at<unsigned char>(j,i) = 255;
+            }
+        }
+    }
+    
+    // get the foreground
+    Mat res;
+    bitwise_and(files, files2, res, mask);
+    
+    // display
+    imshow("res", res);
+   // int percentage=countNonZero(res);
+  //  cout<<percentage;
+    waitKey();
+
+    
     return 0;
 }
 
