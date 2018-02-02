@@ -6,8 +6,9 @@
 //
 //SAMPLE FROM OPENCV WEBSITE
 #include <iostream>
+
 #include<vector>
-#include "opencv2/core/utility.hpp"
+//#include "opencv2/core/utility.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
@@ -15,54 +16,38 @@
 
 using namespace cv;
 using namespace std;
+
 int edgeThresh = 1;
 int edgeThreshScharr=1;
-Mat image, gray, blurImage, edge1, edge2, cedge;
+Mat image, gray, blurImage, edge1, edge2, cedge,edge_detect;
 const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
 const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
 
-// define a trackbar callback
-static void onTrackbar(int, void*)
-{
-    blur(gray, blurImage, Size(3,3));
-    // Run the edge detector on grayscale
-    Canny(blurImage, edge1, edgeThresh, edgeThresh*3, 3);
-    cedge = Scalar::all(0);
-    image.copyTo(cedge, edge1);
-    imshow(window_name1, cedge);
-    Mat dx,dy;
-    Scharr(blurImage,dx,CV_16S,1,0);
-    Scharr(blurImage,dy,CV_16S,0,1);
-    Canny( dx,dy, edge2, edgeThreshScharr, edgeThreshScharr*3 );
-    cedge = Scalar::all(0);
-    image.copyTo(cedge, edge2);
-    imshow(window_name2, cedge);
-}
-static void help()
-{
-    printf("\nThis sample demonstrates Canny edge detection\n"
-           "Call:\n"
-           "    /.edge [image_name -- Default is ../data/fruits.jpg]\n\n");
-}
-
-//const char* keys =
-//{
- //   "{help h||}{@image |/Users/georgemanolakis/desktop/pix/3.png|input image name}"
-//};
+int lowThreshold;
+int const max_lowThreshold = 100;
+int rat = 3;
+int kernel_size = 3;
+Mat files;
+Mat files2;
 
 class Image
 {
-private:
-    string directory ="location=/Users/georgemanolakis/desktop/pix/";
+//private:
+public:
+    string directory ="/Users/georgemanolakis/desktop/pix/";
     vector<string> file_location;
-    int edgeThresh = 1;
-    int edgeThreshScharr=1;
-    vector<Mat> image;
-    Mat gray, blurImage, edge1, edge2, cedge;
+    unsigned long k;
+    unsigned long i;
+   // vector<Mat> image;
+   // vector<Mat> converted_image;
+
     const char* window_name1 = "Edge map : Canny default (Sobel gradient)";
     const char* window_name2 = "Edge map : Canny with custom gradient (Scharr)";
     
- public:
+ //public:
+    vector<Mat> image;
+    vector<Mat> converted_image;
+    Mat gray;
     void append_file_location(string file)
     {
         file_location.push_back(directory + file);
@@ -73,70 +58,99 @@ private:
     }
     string get_file_location()
     {
-        return file_location[0];
+        
+        return file_location.front();
     }
     void append_images()
     {
-        unsigned long i=1;
-        while(i<file_location.size())
+        i=0;
+        k=file_location.size();
+        while(file_location.size() != 0)
         {
         image.push_back(imread(get_file_location(),IMREAD_COLOR));
     
             if(!image[i].empty())
             {
+              //  cout<<file_location[1];
                 pop_file_location();
                 //return; //Need to figure out how to make conditions considering that file directories for that image file to compare with
-            }
-            else
-            {
-                image.erase(image.begin());
                 i=i+1;
+            }
+            else if(image[i].empty())
+            {
+                cout<<"The IMAGE in the location: "<<file_location[0]<<" DOES NOT EXIST.....DELETING IMAGE PATH AND SKIPPING THIS IMAGE ERROR: 1";
+                pop_file_location();
+                image.erase(image.end()-1);
+                //i=i+1;
             }
             
         }
-        
     }
     
-    
 };
+Image file;
 
 
-
+static void image_conversion(int,void*)
+{
+    
+    //while(i <= image.size())
+    //{
+    blur( gray,edge_detect,Size(3,3));
+    Canny(edge_detect,edge_detect,lowThreshold,lowThreshold*rat,kernel_size);
+    files2=Scalar::all(0);
+    files.copyTo(files2,edge_detect);
+    //imshow("hello",files2);
+    //}
+}
 
 int main( int argc, const char** argv )
 {
     Image file;
+    unsigned long i=0;
+    const char* window_name = "Edge Map";
+    
     file.append_file_location("1.png");
     file.append_file_location("2.png");
     file.append_file_location("3.png");
+    file.append_file_location("4.png");
     file.append_images();
-    
-    
-    
-    
-/*
-    help();
-    CommandLineParser parser(argc, argv, keys);
-    string filename = parser.get<string>(0);
-    image = imread(filename, IMREAD_COLOR);
-    if(image.empty())
+    //imshow("window", file.image[0]);
+    //waitKey(0);
+    while(i<file.image.size())
     {
-        printf("Cannot read image file: %s\n", filename.c_str());
-        help();
-        return -1;
+    files=file.image[i];
+    
+     files2.create( files.size(), files.type() );
+    
+    cvtColor(files, gray, COLOR_BGR2GRAY);
+     namedWindow( window_name, WINDOW_AUTOSIZE );
+    createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold,image_conversion);
+    image_conversion(0, 0);
+    file.converted_image.push_back(files2);
+    
+    
+    imshow("test",file.converted_image[i]);
+        i=i+1;
+        waitKey(0);
     }
-    cedge.create(image.size(), image.type());
-    cvtColor(image, gray, COLOR_BGR2GRAY);
-    // Create a window
-    namedWindow(window_name1, 1);
-    namedWindow(window_name2, 1);
-    // create a toolbar
-    createTrackbar("Canny threshold default", window_name1, &edgeThresh, 100, onTrackbar);
-    createTrackbar("Canny threshold Scharr", window_name2, &edgeThreshScharr, 400, onTrackbar);
-    // Show the image
-    onTrackbar(0, 0);
-    // Wait for a key stroke; the same function arranges events processing
-    waitKey(0);
     return 0;
- */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
