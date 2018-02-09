@@ -136,7 +136,7 @@ int main( int argc, const char** argv )
     file.converted_image.push_back(files2);
     
     
-    imshow("test",file.image[i]);
+    imshow("test",file.converted_image[i]);
         i=i+1;
         waitKey(0);
     }
@@ -192,7 +192,7 @@ int main( int argc, const char** argv )
     waitKey();
 
   */
-   /*
+   
     Mat hsv_base;
     Mat  hsv_test1;
     Mat src_test2, hsv_test2;
@@ -253,7 +253,7 @@ int main( int argc, const char** argv )
 
   
     
-    */
+    
     
     return 0;
 }
